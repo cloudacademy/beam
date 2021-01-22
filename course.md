@@ -5,6 +5,12 @@ This file contains text you can copy and paste for the examples in Cloud Academy
 Installing on your own computer: https://cloud.google.com/dataflow/docs/quickstarts  
 Transforms: https://beam.apache.org/documentation/sdks/javadoc/2.0.0/org/apache/beam/sdk/transforms/package-summary.html
 
+Note: Cloud Shell now uses Java 11 by default, so to get this demo to work, switch to Java 8 by running the following command.  
+It will generate errors, but it will still work.
+```
+sudo update-java-alternatives -s java-1.8.0-openjdk-amd64 && export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+```
+
 ```
 git clone https://github.com/cloudacademy/beam.git
 cd beam/examples/java8
