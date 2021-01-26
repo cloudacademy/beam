@@ -20,8 +20,11 @@ package org.apache.beam.examples;
 import org.apache.beam.examples.common.ExampleUtils;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
+import org.apache.beam.sdk.options.Default;
+import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
+import org.apache.beam.sdk.options.Validation.Required;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.MapElements;
@@ -34,9 +37,9 @@ import org.apache.beam.sdk.values.KV;
  * An example that counts words in Shakespeare.
  *
  * <p>This class, {@link MinimalWordCount}, is the first in a series of four successively more
- * detailed 'word count' examples. Here, for simplicity, we don't show any error-checking or
- * argument processing, and focus on construction of the pipeline, which chains together the
- * application of core transforms.
+ * detailed 'word count' examples. Here, for simplicity, we don't show any error-checking, 
+ * and focus on construction of the pipeline, which chains together the application of core
+ * transforms.
  *
  * <p>Next, see the {@link WordCount} pipeline, then the {@link DebuggingWordCount}, and finally the
  * {@link WindowedWordCount} pipeline, for more detailed examples that introduce additional
@@ -51,19 +54,36 @@ import org.apache.beam.sdk.values.KV;
  *   4. Writing data to text files
  * </pre>
  *
- * <p>No arguments are required to run this pipeline. It will be executed with the DirectRunner. You
- * can see the results in the output files in your current working directory, with names like
- * "wordcounts-00001-of-00005. When running on a distributed service, you would use an appropriate
- * file service.
  */
 public class MinimalWordCount {
+
+  public interface WordCountOptions extends PipelineOptions {
+
+    /**
+     * By default, this example reads from a public dataset containing the text of
+     * King Lear. Set this option to choose a different input file or glob.
+     */
+    @Description("Path of the file to read from")
+    @Default.String("gs://apache-beam-samples/shakespeare/kinglear.txt")
+    String getInputFile();
+    void setInputFile(String value);
+
+    /**
+     * Set this required option to specify where to write the output.
+     */
+    @Description("Path of the file to write to")
+    @Required
+    String getOutput();
+    void setOutput(String value);
+  }
 
   public static void main(String[] args) {
     // Create a PipelineOptions object. This object lets us set various execution
     // options for our pipeline, such as the runner you wish to use. This example
     // will run with the DirectRunner by default, based on the class path configured
     // in its dependencies.
-    PipelineOptions options = PipelineOptionsFactory.create();
+    WordCountOptions options = PipelineOptionsFactory.fromArgs(args).withValidation()
+			  .as(WordCountOptions.class);
 
     // Create the Pipeline object with the options we defined above.
     Pipeline p = Pipeline.create(options);
@@ -72,15 +92,14 @@ public class MinimalWordCount {
 
     // Concept #1: Apply a root transform to the pipeline; in this case, TextIO.Read to read a set
     // of input text files. TextIO.Read returns a PCollection where each element is one line from
-    // the input text (a set of Shakespeare's texts).
+    // the input text.
 
-    // This example reads a public data set consisting of the complete works of Shakespeare.
-    p.apply(TextIO.read().from("gs://dataflow-samples/shakespeare/kinglear.txt"))
+    p.apply(TextIO.read().from(options.getInputFile()))
 
      // Concept #2: Apply a ParDo transform to our PCollection of text lines. This ParDo invokes a
      // DoFn (defined in-line) on each element that tokenizes the text line into individual words.
      // The ParDo returns a PCollection<String>, where each element is an individual word in
-     // Shakespeare's collected texts.
+     // the input text.
      .apply("ExtractWords", ParDo.of(new DoFn<String, String>() {
                        @ProcessElement
                        public void processElement(ProcessContext c) {
@@ -111,7 +130,7 @@ public class MinimalWordCount {
      // formatted strings) to a series of text files.
      //
      // By default, it will write to a set of files with names like wordcount-00001-of-00005
-     .apply(TextIO.write().to("wordcounts"));
+     .apply(TextIO.write().to(options.getOutput()));
 
     // Run the pipeline.
     p.run().waitUntilFinish();
