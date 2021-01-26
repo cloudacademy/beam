@@ -29,17 +29,19 @@ gsutil mb $BUCKET
 cd ~/beam/examples/java8
 ```
 ```
-mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.MinimalLineCountArgs \
-  -Dexec.args="--runner=DataflowRunner \
-  --project=$PROJECT \
-  --tempLocation=$BUCKET/temp"
-```
-```
-mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.LineCount \
+mvn -Pdataflow-runner compile exec:java -Dexec.mainClass=org.apache.beam.examples.MinimalLineCountArgs \
   -Dexec.args="--runner=DataflowRunner \
   --project=$PROJECT \
   --tempLocation=$BUCKET/temp \
-  --output=$BUCKET/linecount"
+  --region=us-central1"
+```
+```
+mvn -Pdataflow-runner compile exec:java -Dexec.mainClass=org.apache.beam.examples.LineCount \
+  -Dexec.args="--runner=DataflowRunner \
+  --project=$PROJECT \
+  --tempLocation=$BUCKET/temp \
+  --output=$BUCKET/linecount \
+  --region=us-central1"
 ```
 
 ### Custom Transforms
@@ -47,11 +49,12 @@ mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.LineCount \
 cd ~/beam/examples/java8
 ```
 ```
-mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.MinimalWordCount \
+mvn -Pdataflow-runner compile exec:java -Dexec.mainClass=org.apache.beam.examples.MinimalWordCount \
   -Dexec.args="--runner=DataflowRunner \
   --project=$PROJECT \
   --tempLocation=$BUCKET/temp \
-  --output=$BUCKET/wordcounts"
+  --output=$BUCKET/wordcounts \
+  --region=us-central1"
 ```
 
 ### Composite Transforms
@@ -59,11 +62,12 @@ mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.MinimalWordCount
 cd ~/beam/examples/java8
 ```
 ```
-mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.UserScore \
+mvn -Pdataflow-runner compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.UserScore \
 -Dexec.args="--runner=DataflowRunner \
   --project=$PROJECT \
   --tempLocation=$BUCKET/temp/ \
-  --output=$BUCKET/scores"
+  --output=$BUCKET/scores \
+  --region=us-central1"
 ```
 
 ### Windowing
@@ -71,13 +75,14 @@ mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.Us
 cd ~/beam/examples/java8
 ```
 ```
-mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.HourlyTeamScore \
+mvn -Pdataflow-runner compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.HourlyTeamScore \
 -Dexec.args="--runner=DataflowRunner \
   --project=$PROJECT \
   --tempLocation=$BUCKET/temp/ \
   --output=$BUCKET/scores \
   --startMin=2015-11-16-16-00 \
-  --stopMin=2015-11-17-16-00"
+  --stopMin=2015-11-17-16-00 \
+  --region=us-central1"
 ```
 
 ### Running LeaderBoard
@@ -103,5 +108,6 @@ mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.Le
   --tempLocation=$BUCKET/temp/ \
   --output=$BUCKET/leaderboard \
   --dataset=game \
-  --topic=projects/$PROJECT/topics/game"
+  --topic=projects/$PROJECT/topics/game \
+  --region=us-central1"
 ```
