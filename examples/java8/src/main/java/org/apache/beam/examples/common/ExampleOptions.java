@@ -15,28 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.examples;
+package org.apache.beam.examples.common;
 
-import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.io.TextIO;
+import org.apache.beam.sdk.options.Default;
+import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Count;
-import org.apache.beam.sdk.transforms.MapElements;
-import org.apache.beam.sdk.values.TypeDescriptors;
 
-public class MinimalLineCountArgs {
+/** Options that can be used to configure the Beam examples. */
+public interface ExampleOptions extends PipelineOptions {
+  @Description("Whether to keep jobs running after local process exit")
+  @Default.Boolean(false)
+  boolean getKeepJobsRunning();
 
-  public static void main(String[] args) {
-    PipelineOptions options = PipelineOptionsFactory.fromArgs(args).as(PipelineOptions.class);
-    Pipeline p = Pipeline.create(options);
+  void setKeepJobsRunning(boolean keepJobsRunning);
 
-    p.apply(TextIO.read().from("gs://dataflow-samples/shakespeare/kinglear.txt"))
-     .apply(Count.<String>globally())
-	   .apply(MapElements.into(TypeDescriptors.strings())
-	       .via((Long count) -> Long.toString(count)))
-     .apply(TextIO.write().to("linecount"));
+  @Description("Number of workers to use when executing the injector pipeline")
+  @Default.Integer(1)
+  int getInjectorNumWorkers();
 
-    p.run().waitUntilFinish();
-  }
+  void setInjectorNumWorkers(int numWorkers);
 }

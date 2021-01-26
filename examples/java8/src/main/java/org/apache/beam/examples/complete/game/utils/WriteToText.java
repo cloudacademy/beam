@@ -17,7 +17,7 @@
  */
 package org.apache.beam.examples.complete.game.utils;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -47,32 +47,31 @@ import org.joda.time.format.DateTimeFormatter;
  * Generate, format, and write rows. Use provided information about the field names and types, as
  * well as lambda functions that describe how to generate their values.
  */
-public class WriteToText<InputT>
-    extends PTransform<PCollection<InputT>, PDone> {
+@SuppressWarnings({
+  "nullness" // TODO(https://issues.apache.org/jira/browse/BEAM-10402)
+})
+public class WriteToText<InputT> extends PTransform<PCollection<InputT>, PDone> {
 
   private static final DateTimeFormatter formatter =
       DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS")
-          .withZone(DateTimeZone.forTimeZone(TimeZone.getTimeZone("PST")));
+          .withZone(DateTimeZone.forTimeZone(TimeZone.getTimeZone("America/Los_Angeles")));
 
   protected String filenamePrefix;
   protected Map<String, FieldFn<InputT>> fieldFn;
   protected boolean windowed;
 
-  public WriteToText() {
-  }
+  public WriteToText() {}
 
   public WriteToText(
-      String filenamePrefix,
-      Map<String, FieldFn<InputT>> fieldFn,
-      boolean windowed) {
+      String filenamePrefix, Map<String, FieldFn<InputT>> fieldFn, boolean windowed) {
     this.filenamePrefix = filenamePrefix;
     this.fieldFn = fieldFn;
     this.windowed = windowed;
   }
 
   /**
-   * A {@link Serializable} function from a {@link DoFn.ProcessContext}
-   * and {@link BoundedWindow} to the value for that field.
+   * A {@link Serializable} function from a {@link DoFn.ProcessContext} and {@link BoundedWindow} to
+   * the value for that field.
    */
   public interface FieldFn<InputT> extends Serializable {
     Object apply(DoFn<InputT, String>.ProcessContext context, BoundedWindow window);
@@ -83,7 +82,7 @@ public class WriteToText<InputT>
 
     @ProcessElement
     public void processElement(ProcessContext c, BoundedWindow window) {
-      List<String> fields = new ArrayList<String>();
+      List<String> fields = new ArrayList<>();
       for (Map.Entry<String, FieldFn<InputT>> entry : fieldFn.entrySet()) {
         String key = entry.getKey();
         FieldFn<InputT> fcn = entry.getValue();
@@ -98,7 +97,7 @@ public class WriteToText<InputT>
    * A {@link DoFn} that writes elements to files with names deterministically derived from the
    * lower and upper bounds of their key (an {@link IntervalWindow}).
    */
-  protected class WriteOneFilePerWindow extends PTransform<PCollection<String>, PDone> {
+  protected static class WriteOneFilePerWindow extends PTransform<PCollection<String>, PDone> {
 
     private final String filenamePrefix;
 
@@ -144,11 +143,12 @@ public class WriteToText<InputT>
     }
 
     @Override
-    public ResourceId windowedFilename(int shardNumber,
-                                       int numShards,
-                                       BoundedWindow window,
-                                       PaneInfo paneInfo,
-                                       OutputFileHints outputFileHints) {
+    public ResourceId windowedFilename(
+        int shardNumber,
+        int numShards,
+        BoundedWindow window,
+        PaneInfo paneInfo,
+        OutputFileHints outputFileHints) {
       IntervalWindow intervalWindow = (IntervalWindow) window;
       String filename =
           String.format(
