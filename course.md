@@ -106,7 +106,6 @@ mvn -Pdataflow-runner compile exec:java -Dexec.mainClass=org.apache.beam.example
 -Dexec.args="--runner=DataflowRunner \
   --project=$PROJECT \
   --tempLocation=$BUCKET/temp/ \
-  --output=$BUCKET/leaderboard \
   --dataset=game \
   --topic=projects/$PROJECT/topics/game \
   --region=us-central1"
