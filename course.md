@@ -102,7 +102,7 @@ mvn compile exec:java  -Dexec.mainClass=org.apache.beam.examples.complete.game.i
 cd ~/beam/examples/java8
 ```
 ```
-mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.LeaderBoard \
+mvn -Pdataflow-runner compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.LeaderBoard \
 -Dexec.args="--runner=DataflowRunner \
   --project=$PROJECT \
   --tempLocation=$BUCKET/temp/ \
