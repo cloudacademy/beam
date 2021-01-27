@@ -89,9 +89,8 @@ mvn -Pdataflow-runner compile exec:java -Dexec.mainClass=org.apache.beam.example
 ```
 bq mk game
 ```
-API Console Credentials: https://console.developers.google.com/projectselector/apis/credentials
+Note: You no longer need to use a credentials file to run this example.
 ```
-export GOOGLE_APPLICATION_CREDENTIALS="[Path]/[Credentials file]"
 cd ~/beam/examples/java8
 ```
 ```
